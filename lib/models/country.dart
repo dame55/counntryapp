@@ -4,12 +4,14 @@ class CountrySummary {
   final String flagUrl;
   final int population;
   final String cca2;
+  final String capital;
 
   CountrySummary({
     required this.name,
     required this.flagUrl,
     required this.population,
     required this.cca2,
+    this.capital = '',
   });
 
   factory CountrySummary.fromJson(Map<String, dynamic> json) {
@@ -18,6 +20,12 @@ class CountrySummary {
       flagUrl: (json['flags']?['png'] ?? '') as String,
       population: (json['population'] ?? 0) as int,
       cca2: (json['cca2'] ?? '') as String,
+      capital: (() {
+        final cap = json['capital'];
+        if (cap is List && cap.isNotEmpty) return cap.first as String;
+        if (cap is String) return cap;
+        return '';
+      })(),
     );
   }
 

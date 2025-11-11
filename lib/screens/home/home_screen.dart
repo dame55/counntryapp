@@ -211,26 +211,42 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemCount: list.length,
                         itemBuilder: (c, i) {
                           final country = list[i];
-                          return ListTile(
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                country.flagUrl,
-                                width: 60,
-                                height: 40,
-                                fit: BoxFit.cover,
-                              ),
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    country.flagUrl,
+                                    width: 48,
+                                    height: 48,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        country.name,
+                                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        'Capital: ${country.capital.isNotEmpty ? country.capital : '-'}',
+                                        style: TextStyle(color: Colors.blueGrey[300], fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.favorite_border, size: 28, color: Colors.black54),
+                                  onPressed: () => _favCubit.toggle(country.cca2),
+                                ),
+                              ],
                             ),
-                            title: Text(
-                              country.name,
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                            ),
-                            subtitle: Text('Population: ${country.population}', style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.favorite, color: Colors.red),
-                              onPressed: () => _favCubit.toggle(country.cca2),
-                            ),
-                            onTap: () => Navigator.pushNamed(context, '/detail', arguments: {'cca2': country.cca2, 'name': country.name}),
                           );
                         },
                       );

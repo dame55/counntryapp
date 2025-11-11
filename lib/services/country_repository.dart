@@ -13,14 +13,15 @@ class CountryRepository {
 
   // Minimal fields for list (as required)
   Future<List<CountrySummary>> fetchAllSummaries() async {
-    final res = await client.get('all?fields=name,flags,population,cca2');
+    // include capital so UI can show it in the favorites list
+    final res = await client.get('all?fields=name,flags,population,cca2,capital');
     final data = res.data as List;
     return data.map((e) => CountrySummary.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   // Search by name (minimal fields)
   Future<List<CountrySummary>> searchByName(String name) async {
-    final res = await client.get('name/$name?fields=name,flags,population,cca2');
+    final res = await client.get('name/$name?fields=name,flags,population,cca2,capital');
     final data = res.data as List;
     return data.map((e) => CountrySummary.fromJson(e as Map<String, dynamic>)).toList();
   }

@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../cubits/favorites_cubit.dart';
 import '../../models/country.dart';
 import '../../services/country_repository.dart';
-import '../../widgets/country_tile.dart';
+// note: custom layout used here for favorites list (no CountryTile)
 
 
 class FavoritesScreen extends StatefulWidget {
@@ -56,16 +56,46 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   }
                   final list = snap.data ?? [];
                   return ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: list.length,
                     itemBuilder: (c, i) {
                       final country = list[i];
-                      return CountryTile(
-                        country: country,
-                        trailing: IconButton(
-                          icon: const Icon(Icons.favorite, color: Colors.red),
-                          onPressed: () => _favCubit.toggle(country.cca2),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                country.flagUrl,
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    country.name,
+                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'Capital: ${country.capital.isNotEmpty ? country.capital : '-'}',
+                                    style: TextStyle(color: Colors.blueGrey[300], fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.favorite_border, size: 28, color: Colors.black54),
+                              onPressed: () => _favCubit.toggle(country.cca2),
+                            ),
+                          ],
                         ),
-                        onTap: () => Navigator.pushNamed(context, '/detail', arguments: {'cca2': country.cca2, 'name': country.name}),
                       );
                     },
                   );
