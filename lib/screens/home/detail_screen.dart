@@ -105,8 +105,8 @@ class _DetailScreenState extends State<DetailScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Column(
                         children: [
-                          _buildStatRow("Area", "${d.area} sq km"),
-                          _buildStatRow("Population", "${d.population}"),
+                          _buildStatRow("Area", _formatArea(d.area)),
+                          _buildStatRow("Population", _formatPopulation(d.population)),
                           _buildStatRow("Region", d.region),
                           _buildStatRow("Sub Region", d.subregion),
                         ],
@@ -133,15 +133,14 @@ class _DetailScreenState extends State<DetailScreen> {
                         children: d.timezones
                             .map(
                               (tz) => Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 18),
+                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  border:
-                                      Border.all(color: Colors.grey.shade300),
+                                  border: Border.all(color: Colors.grey.shade300),
+                                  color: Colors.white,
                                 ),
                                 child: Text(
-                                  tz,
+                                  _formatTimezone(tz.toString()),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -192,5 +191,40 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
     );
   }
+}
+
+String _formatArea(double area) {
+  // format with thousand separators and append sq km
+  final formatted = area.toStringAsFixed(0).replaceAllMapped(RegExp(r"\B(?=(\d{3})+(?!\d))"), (m) => ',');
+  return '$formatted sq km';
+}
+
+String _formatPopulation(int pop) {
+  if (pop >= 1000000) {
+    final v = pop / 1000000;
+    return '${v.toStringAsFixed(2)} million';
+  }
+  if (pop >= 1000) {
+    final v = pop / 1000;
+    return '${v.toStringAsFixed(1)}K';
+  }
+  return pop.toString();
+}
+
+String _formatTimezone(String tz) {
+  // Attempt to convert strings like "UTC+01:00" or "UTC-05:00" to "UTC +01"
+  final match = RegExp(r'UTC\s*([+-]?\d{1,2})(?::\d{2})?').firstMatch(tz.replaceAll(' ', ''));
+  if (match != null) {
+    final signAndHour = match.group(1)!;
+    // ensure sign present
+    final withSign = signAndHour.startsWith('+') || signAndHour.startsWith('-') ? signAndHour : '+$signAndHour';
+    return 'UTC ${withSign.replaceAll('+', '+').replaceAll('-', '-')}';
+  }
+  // fallback: if tz already like "UTC+01:00"
+  if (tz.startsWith('UTC') && tz.contains(':')) {
+    final parts = tz.replaceAll('UTC', '').replaceAll(':00', '');
+    return 'UTC ${parts.replaceAll('+', '+').replaceAll('-', '-')}'.trim();
+  }
+  return tz;
 }
 
