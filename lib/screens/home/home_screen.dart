@@ -76,13 +76,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: TextField(
                           controller: _searchController,
-                          onChanged: (v) => _cubit.search(v),
-                          decoration: const InputDecoration(
+                          onChanged: (v) => setState(() { _cubit.search(v); }),
+                          decoration: InputDecoration(
                             hintText: 'Search for a country',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            prefixIcon: Icon(Icons.search, color: Colors.grey),
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            prefixIcon: const Icon(Icons.search, color: Colors.grey),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.close, color: Colors.grey),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      _cubit.search('');
+                                      setState(() {});
+                                    },
+                                  )
+                                : null,
                           ),
                         ),
                       ),
@@ -119,12 +129,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Center(child: Text(state.message));
                 } else if (state is CountriesLoaded) {
                   final list = state.countries;
+                  final isSearching = _searchController.text.trim().isNotEmpty;
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: list.length,
                     itemBuilder: (context, idx) {
                       final c = list[idx];
+                      if (isSearching) {
+                        // compact search result row: 48x48 flag and name only
+                        return InkWell(
+                          onTap: () => _openDetail(c),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    c.flagUrl,
+                                    width: 48,
+                                    height: 48,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Text(
+                                    c.name,
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
 
+                      // default non-search list item (original layout)
                       return ListTile(
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
