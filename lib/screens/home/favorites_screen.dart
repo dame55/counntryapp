@@ -40,7 +40,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return BlocProvider.value(
       value: _favCubit,
       child: Scaffold(
-        appBar: AppBar(title: const Text('Favorites')),
+        appBar: AppBar(title: Center(child: const Text('Favorites'))),
         body: BlocBuilder<FavoritesCubit, FavoritesState>(
           builder: (context, state) {
             if (state is FavoritesInitial) {
