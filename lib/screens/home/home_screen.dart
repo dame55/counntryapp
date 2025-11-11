@@ -104,44 +104,66 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: list.length,
                 itemBuilder: (context, idx) {
                   final c = list[idx];
-                  final isFav = (_favCubit.state is FavoritesLoaded) &&
-                      (_favCubit.state as FavoritesLoaded)
-                          .favorites
-                          .contains(c.cca2);
 
-                  return ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        c.flagUrl,
-                        width: 60,
-                        height: 40,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    title: Text(
-                      c.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    subtitle: Text(
-                      'Population: ${c.population}',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 13,
-                      ),
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(
-                        isFav ? Icons.favorite : Icons.favorite_border_outlined,
-                        color: isFav ? Colors.redAccent : Colors.black54,
-                      ),
-                      onPressed: () => _favCubit.toggle(c.cca2),
-                    ),
-                    onTap: () => _openDetail(c),
-                  );
+                 return ListTile(
+  leading: ClipRRect(
+    borderRadius: BorderRadius.circular(12),
+    child: Image.network(
+      c.flagUrl,
+      width: 60,
+      height: 40,
+      fit: BoxFit.cover,
+    ),
+  ),
+  title: Text(
+    c.name,
+    style: const TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+    ),
+  ),
+  subtitle: Text(
+    'Population: ${c.population}',
+    style: const TextStyle(
+      color: Colors.grey,
+      fontSize: 13,
+    ),
+  ),
+  trailing: GestureDetector(
+    onTap: () {
+      _favCubit.toggle(c.cca2);
+      setState(() {}); // trigger rebuild for animation
+    },
+    child: AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return ScaleTransition(
+          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          child: child,
+        );
+      },
+      child: Icon(
+        (_favCubit.state is FavoritesLoaded &&
+                (_favCubit.state as FavoritesLoaded).favorites.contains(c.cca2))
+            ? Icons.favorite
+            : Icons.favorite_border,
+        key: ValueKey<bool>(
+          (_favCubit.state is FavoritesLoaded &&
+              (_favCubit.state as FavoritesLoaded)
+                  .favorites
+                  .contains(c.cca2)),
+        ),
+        color: (_favCubit.state is FavoritesLoaded &&
+                (_favCubit.state as FavoritesLoaded).favorites.contains(c.cca2))
+            ? Colors.redAccent
+            : Colors.black54,
+        size: 26,
+      ),
+    ),
+  ),
+  onTap: () => _openDetail(c),
+);
+
                 },
               );
             } else {
