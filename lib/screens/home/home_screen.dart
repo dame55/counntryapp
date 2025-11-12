@@ -47,6 +47,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return all.where((c) => ids.contains(c.cca2)).toList();
   }
 
+  Future<void> _onRefreshHome() async {
+    await _cubit.loadCountries();
+    setState(() {});
+  }
+
+  Future<void> _onRefreshFavorites() async {
+    await _favCubit.load();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,10 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else if (state is CountriesLoaded) {
                   final list = state.countries;
                   final isSearching = _searchController.text.trim().isNotEmpty;
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: list.length,
-                    itemBuilder: (context, idx) {
+                  return RefreshIndicator(
+                    onRefresh: _onRefreshHome,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: list.length,
+                      itemBuilder: (context, idx) {
                       final c = list[idx];
                       if (isSearching) {
                         // compact search result row: 48x48 flag and name only
@@ -224,7 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         onTap: () => _openDetail(c),
                       );
-                    },
+                      },
+                    ),
                   );
                 } else {
                   return const SizedBox.shrink();
@@ -247,10 +260,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       final list = snap.data ?? [];
-                      return ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        itemCount: list.length,
-                        itemBuilder: (c, i) {
+                      return RefreshIndicator(
+                        onRefresh: _onRefreshFavorites,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          itemCount: list.length,
+                          itemBuilder: (c, i) {
                           final country = list[i];
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -290,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           );
                         },
-                      );
+                      ));
                     },
                   );
                 } else {

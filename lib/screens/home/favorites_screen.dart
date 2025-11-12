@@ -55,49 +55,55 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   final list = snap.data ?? [];
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: list.length,
-                    itemBuilder: (c, i) {
-                      final country = list[i];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                country.flagUrl,
-                                width: 48,
-                                height: 48,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    country.name,
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    'Capital: ${country.capital.isNotEmpty ? country.capital : '-'}',
-                                    style: TextStyle(color: Colors.blueGrey[300], fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.favorite_border, size: 28, color: Colors.black54),
-                              onPressed: () => _favCubit.toggle(country.cca2),
-                            ),
-                          ],
-                        ),
-                      );
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await _favCubit.load();
+                      setState(() {});
                     },
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: list.length,
+                      itemBuilder: (c, i) {
+                        final country = list[i];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  country.flagUrl,
+                                  width: 48,
+                                  height: 48,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      country.name,
+                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Capital: ${country.capital.isNotEmpty ? country.capital : '-'}',
+                                      style: TextStyle(color: Colors.blueGrey[300], fontSize: 14),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.favorite_border, size: 28, color: Colors.black54),
+                                onPressed: () => _favCubit.toggle(country.cca2),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               );
