@@ -52,9 +52,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 future: _fetchFavoritesList(ids),
                 builder: (context, snap) {
                   if (snap.connectionState != ConnectionState.done) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final list = snap.data ?? [];
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snap.hasError) {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Error: ${snap.error}'),
+                            const SizedBox(height: 12),
+                            ElevatedButton(onPressed: () => _favCubit.load(), child: const Text('Retry')),
+                          ],
+                        ),
+                      );
+                    }
+                    final list = snap.data ?? [];
                   return RefreshIndicator(
                     onRefresh: () async {
                       await _favCubit.load();

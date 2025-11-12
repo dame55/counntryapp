@@ -6,6 +6,7 @@ import '../../services/country_repository.dart';
 import 'detail_screen.dart';
 import '../../cubits/countries_cubit.dart';
 import '../../cubits/favorites_cubit.dart';
+import '../../widgets/error_view.dart';
 
 
 
@@ -134,7 +135,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (state is CountriesLoading || state is CountriesInitial) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is CountriesError) {
-                  return Center(child: Text('Error: ${state.error}'));
+                  return ErrorView(
+                    message: state.error,
+                    onRetry: () async => await _cubit.loadCountries(),
+                  );
                 } else if (state is CountriesEmpty) {
                   return Center(child: Text(state.message));
                 } else if (state is CountriesLoaded) {
